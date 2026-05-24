@@ -6,6 +6,7 @@ import { useGameState } from '../hooks/useGameState'
 import { useChat } from '../hooks/useChat'
 import { useCardStore } from '../store/cardStore'
 import { api } from '../lib/api'
+import { toast } from '../hooks/useToast'
 import LocationCard from '../components/board/LocationCard'
 import VillainZone from '../components/board/VillainZone'
 import HogwartsMarket from '../components/board/HogwartsMarket'
@@ -56,7 +57,13 @@ export default function Game() {
     )
   ]
 
-  const sendAction = (type, payload = {}) => api.sendAction(roomCode, type, payload)
+  const sendAction = async (type, payload = {}) => {
+    try {
+      await api.sendAction(roomCode, type, payload)
+    } catch (e) {
+      toast.error(e.message)
+    }
+  }
 
   return (
     <div className="min-h-screen bg-hogwarts-dark text-hogwarts-parchment flex flex-col">
