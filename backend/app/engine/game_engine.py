@@ -279,7 +279,6 @@ def _refresh_market(state, player_id):
 
 
 def _resolve_dark_arts_phase(state: dict) -> dict:
-    from .adventure_config import ADVENTURE_CONFIG, CARD_DATA
     count = ADVENTURE_CONFIG.get(state["adventure"], {}).get("dark_arts_count", 1)
     deck = state["dark_arts_deck"]["deck"]
     discard = state["dark_arts_deck"]["discard"]
@@ -362,7 +361,6 @@ def _apply_villain_attack(state: dict, attack: dict, active_hero_id: str, hero_i
                 if h["health"] == 0:
                     h["stunned"] = True
         elif target == "random_hero" and hero_ids:
-            import random
             chosen = random.choice(hero_ids)
             hero = state["heroes"].get(chosen)
             if hero:
@@ -384,7 +382,9 @@ def _end_phase(state: dict, player_id: str) -> dict:
 
     if current == "dark_arts":
         state = _resolve_dark_arts_phase(state)
-        state["phase"] = "villain"
+        state = _check_win_lose(state)
+        if not state["winner"]:
+            state["phase"] = "villain"
     elif current == "villain":
         state = _resolve_villain_phase(state)
         state = _check_win_lose(state)
