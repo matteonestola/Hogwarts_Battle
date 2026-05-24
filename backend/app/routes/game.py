@@ -110,6 +110,17 @@ async def game_action(
 
     sb.table("rooms").update(updates).eq("id", room["id"]).execute()
 
+    if new_state.get("winner") == "heroes":
+        try:
+            adventure = new_state.get("adventure", 1)
+            if 1 <= adventure <= 6:
+                sb.table("user_adventures").upsert(
+                    {"user_id": user["id"], "adventure": adventure + 1},
+                    on_conflict="user_id,adventure"
+                ).execute()
+        except Exception:
+            pass  # non-fatal
+
     _log_event(sb, room["id"], new_state["turn"], body.type.value.lower(), {
         "player_id": user["id"],
         **body.payload,
