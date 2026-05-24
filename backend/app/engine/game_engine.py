@@ -178,6 +178,19 @@ def _draw_cards(state, hero_id, count):
             hero["hand"].append(hero["deck"].pop(0))
 
 
+def _reset_hero_for_next_turn(state: dict, hero_id: str) -> None:
+    hero = state["heroes"][hero_id]
+    if hero.get("stunned"):
+        hero["stunned"] = False
+        hero["health"] = STUN_RECOVERY_HEALTH
+    hero["discard"].extend(hero["hand"])
+    hero["hand"] = []
+    hero["influence_tokens"] = 0
+    hero["attack_tokens"] = 0
+    hero.pop("detained", None)
+    _draw_cards(state, hero_id, 5)
+
+
 def _assign_attack(state, payload, player_id):
     villain_id = payload.get("villain_id")
     hero_id = _get_active_hero_id(state, player_id)
@@ -235,22 +248,7 @@ def _end_turn(state: dict, player_id: str) -> dict:
 
     hero = state["heroes"][hero_id]
 
-    if hero.get("stunned"):
-        hero["discard"].extend(hero["hand"])
-        hero["hand"] = []
-        hero["stunned"] = False
-        hero["health"] = STUN_RECOVERY_HEALTH
-        hero["influence_tokens"] = 0
-        hero["attack_tokens"] = 0
-        hero.pop("detained", None)
-        _draw_cards(state, hero_id, 5)
-    else:
-        hero["discard"].extend(hero["hand"])
-        hero["hand"] = []
-        hero["influence_tokens"] = 0
-        hero["attack_tokens"] = 0
-        hero.pop("detained", None)
-        _draw_cards(state, hero_id, 5)
+    _reset_hero_for_next_turn(state, hero_id)
 
     turn_order = state["turn_order"]
     current_idx = turn_order.index(hero_id) if hero_id in turn_order else 0
@@ -264,16 +262,8 @@ def _end_turn(state: dict, player_id: str) -> dict:
     max_skip = len(turn_order)
     skipped = 0
     while skipped < max_skip and state["heroes"][next_hero_id].get("stunned"):
-        next_hero = state["heroes"][next_hero_id]
         # Apply stun recovery to skipped hero
-        next_hero["discard"].extend(next_hero["hand"])
-        next_hero["hand"] = []
-        next_hero["stunned"] = False
-        next_hero["health"] = STUN_RECOVERY_HEALTH
-        next_hero["influence_tokens"] = 0
-        next_hero["attack_tokens"] = 0
-        next_hero.pop("detained", None)
-        _draw_cards(state, next_hero_id, 5)
+        _reset_hero_for_next_turn(state, next_hero_id)
         # Advance again
         current_idx = turn_order.index(next_hero_id)
         next_idx = (current_idx + 1) % len(turn_order)
