@@ -2,21 +2,21 @@ import { useEffect } from 'react'
 import { supabase } from '../lib/supabase'
 import { useGameStore } from '../store/gameStore'
 
-export function useGameState(roomCode) {
+export function useGameState(roomId) {
   const { setGameState, setRoom } = useGameStore()
 
   useEffect(() => {
-    if (!roomCode) return
+    if (!roomId) return
 
     const channel = supabase
-      .channel(`room:${roomCode}:state`)
+      .channel(`state:${roomId}`)
       .on(
         'postgres_changes',
         {
           event: 'UPDATE',
           schema: 'public',
           table: 'rooms',
-          filter: `code=eq.${roomCode}`,
+          filter: `id=eq.${roomId}`,
         },
         (payload) => {
           setRoom(payload.new)
@@ -26,5 +26,5 @@ export function useGameState(roomCode) {
       .subscribe()
 
     return () => supabase.removeChannel(channel)
-  }, [roomCode, setGameState, setRoom])
+  }, [roomId, setGameState, setRoom])
 }

@@ -26,8 +26,8 @@ export default function Game() {
 
   const roomCode = window.location.pathname.split('/game/')[1]
 
-  useGameState(roomCode)
-  useChat(roomCode)
+  useGameState(roomId)
+  useChat(roomId)
 
   useEffect(() => {
     if (!roomCode) return

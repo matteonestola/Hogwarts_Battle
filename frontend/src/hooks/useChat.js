@@ -2,26 +2,26 @@ import { useEffect } from 'react'
 import { supabase } from '../lib/supabase'
 import { useGameStore } from '../store/gameStore'
 
-export function useChat(roomCode) {
+export function useChat(roomId) {
   const { addChatMessage, addEventLog } = useGameStore()
 
   useEffect(() => {
-    if (!roomCode) return
+    if (!roomId) return
 
     const chatChannel = supabase
-      .channel(`room:${roomCode}:chat`)
+      .channel(`chat:${roomId}`)
       .on(
         'postgres_changes',
-        { event: 'INSERT', schema: 'public', table: 'chat_messages', filter: `room_code=eq.${roomCode}` },
+        { event: 'INSERT', schema: 'public', table: 'chat_messages', filter: `room_id=eq.${roomId}` },
         (payload) => addChatMessage(payload.new)
       )
       .subscribe()
 
     const logChannel = supabase
-      .channel(`room:${roomCode}:log`)
+      .channel(`log:${roomId}`)
       .on(
         'postgres_changes',
-        { event: 'INSERT', schema: 'public', table: 'event_log', filter: `room_code=eq.${roomCode}` },
+        { event: 'INSERT', schema: 'public', table: 'event_log', filter: `room_id=eq.${roomId}` },
         (payload) => addEventLog(payload.new)
       )
       .subscribe()
@@ -30,5 +30,5 @@ export function useChat(roomCode) {
       supabase.removeChannel(chatChannel)
       supabase.removeChannel(logChannel)
     }
-  }, [roomCode, addChatMessage, addEventLog])
+  }, [roomId, addChatMessage, addEventLog])
 }
