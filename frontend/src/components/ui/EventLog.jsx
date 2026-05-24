@@ -1,20 +1,16 @@
 import { useRef, useEffect } from 'react'
+import { useTranslation } from 'react-i18next'
 import { useGameStore } from '../../store/gameStore'
 
 const EVENT_ICONS = {
-  play_card: '🃏',
-  buy_card: '🔮',
-  assign_attack: '⚔️',
-  end_turn: '🔄',
-  villain_attack: '💀',
-  dark_arts: '🌑',
-  hero_stunned: '⚡',
-  villain_defeated: '✨',
-  default: '•',
+  play_card: '🃏', buy_card: '🔮', assign_attack: '⚔️',
+  end_turn: '🔄', villain: '💀', dark_arts: '🌑',
+  hero_stunned: '⚡', villain_defeated: '✨', game_start: '🏰', default: '•',
 }
 
 export default function EventLog() {
   const { eventLog } = useGameStore()
+  const { i18n } = useTranslation()
   const bottomRef = useRef()
 
   useEffect(() => {
@@ -27,12 +23,17 @@ export default function EventLog() {
         📜 Log
       </div>
       <div className="flex-1 overflow-y-auto p-2 space-y-0.5 text-xs">
-        {eventLog.map((e) => (
-          <div key={e.id} className="text-hogwarts-parchment/70 leading-relaxed">
-            <span className="mr-1">{EVENT_ICONS[e.event_type] || EVENT_ICONS.default}</span>
-            <span>{e.payload?.text || e.event_type}</span>
-          </div>
-        ))}
+        {eventLog.map((e) => {
+          const text = i18n.language === 'en'
+            ? e.payload?.text_en
+            : e.payload?.text_it
+          return (
+            <div key={e.id} className="text-hogwarts-parchment/70 leading-relaxed">
+              <span className="mr-1">{EVENT_ICONS[e.event_type] || EVENT_ICONS.default}</span>
+              <span>{text || e.event_type}</span>
+            </div>
+          )
+        })}
         <div ref={bottomRef} />
       </div>
     </div>

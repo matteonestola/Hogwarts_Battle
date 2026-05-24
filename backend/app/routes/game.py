@@ -130,12 +130,29 @@ async def game_action(
 
 
 def _log_event(sb, room_id: str, turn: int, event_type: str, payload: dict):
+    text_map = {
+        "play_card": {"it": "ha giocato {card_id}", "en": "played {card_id}"},
+        "buy_card": {"it": "ha comprato {card_id}", "en": "bought {card_id}"},
+        "assign_attack": {"it": "attacca {villain_id}", "en": "attacks {villain_id}"},
+        "end_turn": {"it": "fine turno", "en": "end turn"},
+        "dark_arts": {"it": "fase Arti Oscure risolta", "en": "Dark Arts phase resolved"},
+        "villain": {"it": "fase Attacco Malvagi risolta", "en": "Villain Attack phase resolved"},
+        "game_start": {"it": "partita iniziata - Avventura {adventure}", "en": "game started - Adventure {adventure}"},
+        "end_phase": {"it": "fine fase", "en": "end phase"},
+    }
+    entry = text_map.get(event_type, {"it": event_type, "en": event_type})
+    try:
+        text_it = entry["it"].format(**payload)
+        text_en = entry["en"].format(**payload)
+    except KeyError:
+        text_it = entry["it"]
+        text_en = entry["en"]
     try:
         sb.table("event_log").insert({
             "room_id": room_id,
             "turn": turn,
             "event_type": event_type,
-            "payload": payload,
+            "payload": {**payload, "text_it": text_it, "text_en": text_en},
         }).execute()
     except Exception:
         pass
