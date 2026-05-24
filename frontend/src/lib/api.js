@@ -35,4 +35,6 @@ export const api = {
   getChat: (code) => request('GET', `/rooms/${code}/chat`),
   sendChat: (code, content) =>
     request('POST', `/rooms/${code}/chat`, { content }),
+  getCards: (adventure = 1) =>
+    request('GET', `/cards?adventure=${adventure}`),
 }
