@@ -81,16 +81,20 @@ export default function Game() {
         </div>
       </div>
 
-      {/* Main board */}
-      <div className="flex-1 grid grid-cols-12 gap-2 p-3 overflow-hidden">
+      {/* Main board — desktop: 3 columns; mobile: stacked */}
+      <div className="flex-1 grid grid-cols-1 md:grid-cols-12 gap-2 p-3 overflow-auto">
         {/* Left: Location + Villains */}
-        <div className="col-span-3 space-y-2">
-          <LocationCard locations={gameState.locations} />
-          <VillainZone villains={gameState.villains} onAttack={(id) => sendAction('ASSIGN_ATTACK', { villain_id: id })} />
+        <div className="md:col-span-3 space-y-2 flex flex-row md:flex-col gap-2 overflow-x-auto">
+          <div className="min-w-[160px] md:min-w-0 flex-shrink-0 md:flex-shrink">
+            <LocationCard locations={gameState.locations} />
+          </div>
+          <div className="min-w-[200px] md:min-w-0 flex-shrink-0 md:flex-shrink">
+            <VillainZone villains={gameState.villains} onAttack={(id) => sendAction('ASSIGN_ATTACK', { villain_id: id })} />
+          </div>
         </div>
 
         {/* Center: Market + Phase + Heroes */}
-        <div className="col-span-6 flex flex-col gap-2">
+        <div className="md:col-span-6 flex flex-col gap-2">
           <PhaseIndicator phase={gameState.phase} activePlayer={gameState.active_player_id} heroes={gameState.heroes} />
           <HogwartsMarket
             market={gameState.hogwarts_market}
@@ -98,7 +102,7 @@ export default function Game() {
             disabled={!isMyTurn || gameState.phase !== 'actions'}
           />
           <DarkArtsDeck darkArts={gameState.dark_arts_deck} />
-          <div className="flex-1 space-y-1">
+          <div className="space-y-1">
             {Object.entries(gameState.heroes).map(([heroId, hero]) => (
               <HeroPanel
                 key={heroId}
@@ -118,13 +122,32 @@ export default function Game() {
               {t('game.endTurn')}
             </button>
           )}
+          {isMyTurn && (gameState.phase === 'dark_arts' || gameState.phase === 'villain') && (
+            <button
+              onClick={() => sendAction('END_PHASE')}
+              className="w-full py-2 bg-purple-900 text-white font-bold rounded-lg hover:bg-purple-800"
+            >
+              Risolvi fase →
+            </button>
+          )}
         </div>
 
-        {/* Right: Chat + Log */}
-        <div className="col-span-3 flex flex-col gap-2">
+        {/* Right: Chat + Log — hidden on mobile */}
+        <div className="md:col-span-3 flex flex-col gap-2 hidden md:flex">
           <ChatPanel roomCode={roomCode} />
           <EventLog />
         </div>
+      </div>
+
+      {/* Mobile: show/hide chat */}
+      <div className="md:hidden border-t border-hogwarts-gold/20 p-2">
+        <details>
+          <summary className="text-sm text-hogwarts-gold cursor-pointer">💬 Chat & Log</summary>
+          <div className="mt-2 space-y-2 max-h-60 overflow-auto">
+            <ChatPanel roomCode={roomCode} />
+            <EventLog />
+          </div>
+        </details>
       </div>
 
       {gameState.winner && <VictoryModal winner={gameState.winner} />}
