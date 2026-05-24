@@ -7,7 +7,18 @@
       "mcp__plugin_supabase_supabase__confirm_cost",
       "mcp__plugin_supabase_supabase__get_publishable_keys",
       "mcp__plugin_supabase_supabase__get_project_url",
-      "mcp__plugin_supabase_supabase__apply_migration"
+      "mcp__plugin_supabase_supabase__apply_migration",
+      "PowerShell(New-Item *)",
+      "PowerShell(python -c \"import base64, json; header = base64.urlsafe_b64encode\\(json.dumps\\({'alg':'HS256','typ':'JWT'}\\).encode\\(\\)\\).rstrip\\(b'='\\).decode\\(\\); payload = base64.urlsafe_b64encode\\(json.dumps\\({'role':'service_role','iat':1000000,'exp':9999999999}\\).encode\\(\\)\\).rstrip\\(b'='\\).decode\\(\\); sig = base64.urlsafe_b64encode\\(b'fakesig'\\).rstrip\\(b'='\\).decode\\(\\); print\\(f'{header}.{payload}.{sig}'\\)\")",
+      "Bash(git *)",
+      "Bash(Remove-Item *)",
+      "Bash(python -m pytest tests/test_game_engine.py -v)",
+      "Bash(python -m pytest tests/test_game_engine.py::test_stunned_hero_recovers_next_turn -v)",
+      "Bash(python -c \"from app.main import app; print\\('OK'\\)\")",
+      "Bash(npm run *)",
+      "Bash(python -m pytest tests/ -v)",
+      "Bash(npm install *)",
+      "Bash(node -e ' *)"
     ]
   }
 }
