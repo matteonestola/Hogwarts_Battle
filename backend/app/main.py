@@ -2,7 +2,7 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from .config import settings
-from .routes import rooms, game, chat
+from .routes import rooms, game, chat, adventures
 from .auth import get_supabase
 
 
@@ -28,6 +28,7 @@ app.include_router(rooms.router, prefix="/rooms", tags=["rooms"])
 app.include_router(game.router, prefix="/rooms", tags=["game"])
 app.include_router(game.cards_router, prefix="/cards", tags=["cards"])
 app.include_router(chat.router, prefix="/rooms", tags=["chat"])
+app.include_router(adventures.router, prefix="/adventures", tags=["adventures"])
 
 
 @app.get("/health")
