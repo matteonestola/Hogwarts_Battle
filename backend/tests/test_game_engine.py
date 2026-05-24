@@ -1,4 +1,4 @@
-from app.engine.game_engine import build_initial_state, apply_action
+from app.engine.game_engine import build_initial_state
 
 HERO_ASSIGNMENTS = {
     "harry": "player-1",
