@@ -1,0 +1,67 @@
+{
+  "app": {
+    "title": "Hogwarts Battle",
+    "loading": "Caricamento..."
+  },
+  "auth": {
+    "login": "Accedi con Google",
+    "logout": "Esci",
+    "welcome": "Benvenuto, {{name}}"
+  },
+  "lobby": {
+    "title": "Sala d'attesa",
+    "create": "Crea partita",
+    "join": "Unisciti",
+    "joinCode": "Codice sala",
+    "adventure": "Avventura",
+    "language": "Lingua",
+    "heroSelect": "Scegli eroe",
+    "start": "Inizia partita",
+    "copyCode": "Copia codice",
+    "waitingPlayers": "In attesa di giocatori...",
+    "players": "Giocatori"
+  },
+  "game": {
+    "phase": {
+      "dark_arts": "Arti Oscure",
+      "villain": "Attacco Malvagi",
+      "actions": "Azioni",
+      "end": "Fine Turno"
+    },
+    "turn": "Turno {{n}}",
+    "activePlayer": "Turno di {{name}}",
+    "endTurn": "Fine Turno",
+    "buyCard": "Acquista",
+    "playCard": "Gioca",
+    "attack": "Attacca",
+    "refreshMarket": "Aggiorna Mercato",
+    "influence": "Influenza",
+    "attackTokens": "Attacco",
+    "health": "Vita",
+    "stunned": "Stordito!",
+    "victory": "Vittoria!",
+    "defeat": "Sconfitti",
+    "location": "Luogo Attivo",
+    "controlTokens": "Token Controllo",
+    "villains": "Malvagi",
+    "market": "Mercato Hogwarts",
+    "darkArts": "Arti Oscure",
+    "hand": "Mano"
+  },
+  "chat": {
+    "placeholder": "Messaggio...",
+    "send": "Invia"
+  },
+  "heroes": {
+    "harry": "Harry Potter",
+    "ron": "Ron Weasley",
+    "hermione": "Hermione Granger",
+    "neville": "Neville Paciock"
+  },
+  "errors": {
+    "roomNotFound": "Sala non trovata",
+    "invalidCode": "Codice non valido",
+    "alreadyFull": "Sala piena",
+    "notYourTurn": "Non è il tuo turno"
+  }
+}

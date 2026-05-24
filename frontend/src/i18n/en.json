@@ -1,0 +1,67 @@
+{
+  "app": {
+    "title": "Hogwarts Battle",
+    "loading": "Loading..."
+  },
+  "auth": {
+    "login": "Sign in with Google",
+    "logout": "Sign out",
+    "welcome": "Welcome, {{name}}"
+  },
+  "lobby": {
+    "title": "Lobby",
+    "create": "Create game",
+    "join": "Join",
+    "joinCode": "Room code",
+    "adventure": "Adventure",
+    "language": "Language",
+    "heroSelect": "Choose hero",
+    "start": "Start game",
+    "copyCode": "Copy code",
+    "waitingPlayers": "Waiting for players...",
+    "players": "Players"
+  },
+  "game": {
+    "phase": {
+      "dark_arts": "Dark Arts",
+      "villain": "Villain Attack",
+      "actions": "Actions",
+      "end": "End Turn"
+    },
+    "turn": "Turn {{n}}",
+    "activePlayer": "{{name}}'s turn",
+    "endTurn": "End Turn",
+    "buyCard": "Buy",
+    "playCard": "Play",
+    "attack": "Attack",
+    "refreshMarket": "Refresh Market",
+    "influence": "Influence",
+    "attackTokens": "Attack",
+    "health": "Health",
+    "stunned": "Stunned!",
+    "victory": "Victory!",
+    "defeat": "Defeated",
+    "location": "Active Location",
+    "controlTokens": "Control Tokens",
+    "villains": "Villains",
+    "market": "Hogwarts Market",
+    "darkArts": "Dark Arts",
+    "hand": "Hand"
+  },
+  "chat": {
+    "placeholder": "Message...",
+    "send": "Send"
+  },
+  "heroes": {
+    "harry": "Harry Potter",
+    "ron": "Ron Weasley",
+    "hermione": "Hermione Granger",
+    "neville": "Neville Longbottom"
+  },
+  "errors": {
+    "roomNotFound": "Room not found",
+    "invalidCode": "Invalid code",
+    "alreadyFull": "Room is full",
+    "notYourTurn": "Not your turn"
+  }
+}
