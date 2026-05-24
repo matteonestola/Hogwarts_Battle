@@ -3,10 +3,10 @@ import copy
 from .adventure_config import ADVENTURE_CONFIG, VILLAIN_DATA, LOCATION_DATA, CARD_DATA
 
 HERO_START_DECKS = {
-    "harry": ["alohomora"] * 7 + ["lev_wingardium"] * 3,
-    "ron": ["alohomora"] * 7 + ["lev_wingardium"] * 3,
-    "hermione": ["alohomora"] * 7 + ["lev_wingardium"] * 3,
-    "neville": ["alohomora"] * 7 + ["lev_wingardium"] * 3,
+    "harry":    ["alohomora"] * 7 + ["wingardium_leviosa"] * 3,
+    "ron":      ["alohomora"] * 7 + ["wingardium_leviosa"] * 3,
+    "hermione": ["alohomora"] * 7 + ["wingardium_leviosa"] * 3,
+    "neville":  ["alohomora"] * 7 + ["wingardium_leviosa"] * 3,
 }
 
 HERO_HEALTH = {"harry": 10, "ron": 10, "hermione": 10, "neville": 10}
