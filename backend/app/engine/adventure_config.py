@@ -70,7 +70,7 @@ VILLAIN_DATA = {
     },
     "fenrir": {
         "id": "fenrir",
-        "name_it": "Fenrir Grayback",
+        "name_it": "Fenrir Greyback",
         "name_en": "Fenrir Greyback",
         "health_max": 8,
         "attack_tokens": 2,
