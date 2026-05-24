@@ -38,4 +38,6 @@ export const api = {
   getCards: (adventure = 1) =>
     request('GET', `/cards?adventure=${adventure}`),
   getUnlockedAdventures: () => request('GET', '/adventures/unlocked'),
+  transferHero: (code, body) =>
+    request('POST', `/rooms/${code}/transfer-hero`, body),
 }

@@ -1,6 +1,7 @@
 import random
 import string
 from fastapi import APIRouter, Depends, HTTPException
+from pydantic import BaseModel
 from ..auth import get_current_user, get_supabase
 from ..models.schemas import CreateRoomRequest, AssignHeroesRequest
 
@@ -113,5 +114,35 @@ async def leave_room(
 
     if room["host_id"] == user["id"]:
         sb.table("rooms").update({"status": "finished"}).eq("id", room["id"]).execute()
+
+    return {"ok": True}
+
+
+class TransferHeroRequest(BaseModel):
+    from_player_id: str
+    to_player_id: str
+
+@router.post("/{code}/transfer-hero")
+async def transfer_hero(
+    code: str,
+    body: TransferHeroRequest,
+    user: dict = Depends(get_current_user),
+    sb=Depends(get_supabase),
+):
+    room_res = sb.table("rooms").select("*").eq("code", code.upper()).single().execute()
+    if not room_res.data:
+        raise HTTPException(status_code=404, detail="Room not found")
+    room = room_res.data
+    if room["host_id"] != user["id"]:
+        raise HTTPException(status_code=403, detail="Only host can transfer heroes")
+
+    game_state = room["game_state"]
+    if game_state:
+        for hero in game_state["heroes"].values():
+            if hero["player_id"] == body.from_player_id:
+                hero["player_id"] = body.to_player_id
+        if game_state["active_player_id"] == body.from_player_id:
+            game_state["active_player_id"] = body.to_player_id
+        sb.table("rooms").update({"game_state": game_state}).eq("id", room["id"]).execute()
 
     return {"ok": True}

@@ -6,6 +6,8 @@ export const useGameStore = create((set) => ({
   gameState: null,
   chatMessages: [],
   eventLog: [],
+  paused: false,
+  pausedPlayer: null,
 
   setRoom: (room) => set({ room, roomId: room?.id ?? null }),
   setGameState: (gameState) => set({ gameState }),
@@ -13,5 +15,6 @@ export const useGameStore = create((set) => ({
   setChatMessages: (chatMessages) => set({ chatMessages }),
   addEventLog: (event) => set((s) => ({ eventLog: [...s.eventLog, event] })),
   setEventLog: (eventLog) => set({ eventLog }),
-  reset: () => set({ room: null, roomId: null, gameState: null, chatMessages: [], eventLog: [] }),
+  setPaused: (paused, pausedPlayer = null) => set({ paused, pausedPlayer }),
+  reset: () => set({ room: null, roomId: null, gameState: null, chatMessages: [], eventLog: [], paused: false, pausedPlayer: null }),
 }))

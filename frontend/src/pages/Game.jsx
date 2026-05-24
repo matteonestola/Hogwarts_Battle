@@ -4,6 +4,7 @@ import { useGameStore } from '../store/gameStore'
 import { useAuthStore } from '../store/authStore'
 import { useGameState } from '../hooks/useGameState'
 import { useChat } from '../hooks/useChat'
+import { usePresence } from '../hooks/usePresence'
 import { useCardStore } from '../store/cardStore'
 import { api } from '../lib/api'
 import { toast } from '../hooks/useToast'
@@ -18,6 +19,7 @@ import PhaseIndicator from '../components/ui/PhaseIndicator'
 import LanguageToggle from '../components/ui/LanguageToggle'
 import VictoryModal from '../components/modals/VictoryModal'
 import StunnedModal from '../components/modals/StunnedModal'
+import PauseOverlay from '../components/ui/PauseOverlay'
 
 export default function Game() {
   const { t } = useTranslation()
@@ -29,6 +31,7 @@ export default function Game() {
 
   useGameState(roomId)
   useChat(roomId)
+  usePresence(roomId)
 
   useEffect(() => {
     if (!roomCode) return
@@ -151,6 +154,7 @@ export default function Game() {
       </div>
 
       {gameState.winner && <VictoryModal winner={gameState.winner} />}
+      <PauseOverlay roomCode={roomCode} />
     </div>
   )
 }
