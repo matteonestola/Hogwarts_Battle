@@ -311,5 +311,6 @@ def _check_win_lose(state):
     total_villains = len(config.get("villains", []))
     if total_villains > 0 and len(state["villains"]["defeated"]) >= total_villains:
         state["winner"] = "heroes"
+        return state
 
     return state
