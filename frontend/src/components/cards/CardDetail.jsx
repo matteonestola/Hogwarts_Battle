@@ -1,8 +1,15 @@
 import { useTranslation } from 'react-i18next'
+import CardImageUpload from '../ui/CardImageUpload'
+import { useGameStore } from '../../store/gameStore'
+import { useAuthStore } from '../../store/authStore'
+import { useCardStore } from '../../store/cardStore'
 
 export default function CardDetail({ cardData, cardId, onClose, onAction, showBuy }) {
   const { t, i18n } = useTranslation()
   const lang = i18n.language
+  const { room } = useGameStore()
+  const { user } = useAuthStore()
+  const isHost = room?.host_id === user?.id
 
   const name = cardData?.[`name_${lang}`] || cardData?.name_it || cardId
   const abilityText = cardData?.[`ability_text_${lang}`] || cardData?.ability_text_it || ''
@@ -42,6 +49,18 @@ export default function CardDetail({ cardData, cardId, onClose, onAction, showBu
               </span>
             ))}
           </div>
+        )}
+
+        {isHost && (
+          <CardImageUpload
+            cardId={cardId}
+            onUploaded={(url) => {
+              useCardStore.getState().cards[cardId] = {
+                ...useCardStore.getState().cards[cardId],
+                image_url: url,
+              }
+            }}
+          />
         )}
 
         {onAction && (
