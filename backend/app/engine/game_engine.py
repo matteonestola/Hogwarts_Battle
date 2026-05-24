@@ -278,16 +278,120 @@ def _refresh_market(state, player_id):
     return state
 
 
-def _end_phase(state, player_id):
-    phase_order = ["dark_arts", "villain", "actions", "end"]
+def _resolve_dark_arts_phase(state: dict) -> dict:
+    from .adventure_config import ADVENTURE_CONFIG, CARD_DATA
+    count = ADVENTURE_CONFIG.get(state["adventure"], {}).get("dark_arts_count", 1)
+    deck = state["dark_arts_deck"]["deck"]
+    discard = state["dark_arts_deck"]["discard"]
+
+    for _ in range(count):
+        if not deck:
+            deck = _shuffle(discard)
+            discard = []
+        if deck:
+            card_id = deck.pop(0)
+            discard.append(card_id)
+            card = CARD_DATA.get(card_id, {})
+            active_hero_id = _get_active_hero_id(state, state["active_player_id"])
+            for effect in card.get("effects", []):
+                _apply_dark_arts_effect(state, effect, active_hero_id)
+
+    state["dark_arts_deck"]["deck"] = deck
+    state["dark_arts_deck"]["discard"] = discard
+    state["dark_arts_deck"]["deck_count"] = len(deck)
+    return state
+
+
+def _apply_dark_arts_effect(state: dict, effect: dict, active_hero_id: str) -> None:
+    etype = effect["type"]
+    val = effect["value"]
+
+    if etype == "damage_all":
+        for h in state["heroes"].values():
+            h["health"] = max(0, h["health"] - val)
+            if h["health"] == 0:
+                h["stunned"] = True
+    elif etype == "damage_active_hero" and active_hero_id:
+        hero = state["heroes"].get(active_hero_id)
+        if hero:
+            hero["health"] = max(0, hero["health"] - val)
+            if hero["health"] == 0:
+                hero["stunned"] = True
+    elif etype == "control_token":
+        idx = state["locations"]["active_index"]
+        active_loc = state["locations"]["stack"][idx]
+        loc_id = active_loc["id"]
+        state["locations"]["control_tokens"][loc_id] = (
+            state["locations"]["control_tokens"].get(loc_id, 0) + val
+        )
+
+
+def _resolve_villain_phase(state: dict) -> dict:
+    active_hero_id = _get_active_hero_id(state, state["active_player_id"])
+    hero_ids = list(state["heroes"].keys())
+
+    for villain in state["villains"]["active"]:
+        for attack in villain.get("attack_each_turn", []):
+            _apply_villain_attack(state, attack, active_hero_id, hero_ids)
+
+    return state
+
+
+def _apply_villain_attack(state: dict, attack: dict, active_hero_id: str, hero_ids: list) -> None:
+    atype = attack["type"]
+    target = attack["target"]
+    val = attack["value"]
+
+    if atype == "control_token" and target == "active_location":
+        idx = state["locations"]["active_index"]
+        active_loc = state["locations"]["stack"][idx]
+        loc_id = active_loc["id"]
+        state["locations"]["control_tokens"][loc_id] = (
+            state["locations"]["control_tokens"].get(loc_id, 0) + val
+        )
+    elif atype == "damage":
+        if target == "active_hero" and active_hero_id:
+            hero = state["heroes"].get(active_hero_id)
+            if hero:
+                hero["health"] = max(0, hero["health"] - val)
+                if hero["health"] == 0:
+                    hero["stunned"] = True
+        elif target == "all_heroes":
+            for h in state["heroes"].values():
+                h["health"] = max(0, h["health"] - val)
+                if h["health"] == 0:
+                    h["stunned"] = True
+        elif target == "random_hero" and hero_ids:
+            import random
+            chosen = random.choice(hero_ids)
+            hero = state["heroes"].get(chosen)
+            if hero:
+                hero["health"] = max(0, hero["health"] - val)
+                if hero["health"] == 0:
+                    hero["stunned"] = True
+    elif atype == "discard" and target == "active_hero" and active_hero_id:
+        hero = state["heroes"].get(active_hero_id)
+        if hero and hero["hand"]:
+            discarded = hero["hand"].pop(0)
+            hero["discard"].append(discarded)
+    elif atype == "detain" and target == "active_hero":
+        if active_hero_id and active_hero_id in state["heroes"]:
+            state["heroes"][active_hero_id]["detained"] = True
+
+
+def _end_phase(state: dict, player_id: str) -> dict:
     current = state.get("phase", "dark_arts")
-    idx = phase_order.index(current) if current in phase_order else 0
 
-    if idx < len(phase_order) - 1:
-        state["phase"] = phase_order[idx + 1]
-
-    if state["phase"] == "end":
-        return _end_turn(state, player_id)
+    if current == "dark_arts":
+        state = _resolve_dark_arts_phase(state)
+        state["phase"] = "villain"
+    elif current == "villain":
+        state = _resolve_villain_phase(state)
+        state = _check_win_lose(state)
+        if not state["winner"]:
+            state["phase"] = "actions"
+    elif current in ("actions", "end"):
+        state = _end_turn(state, player_id)
 
     return state
 
