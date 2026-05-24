@@ -2,8 +2,38 @@ from fastapi import APIRouter, Depends, HTTPException
 from ..auth import get_current_user, get_supabase
 from ..models.schemas import GameActionRequest
 from ..engine.game_engine import build_initial_state, apply_action
+from ..engine.adventure_config import CARD_DATA
 
 router = APIRouter()
+cards_router = APIRouter()
+
+
+def seed_cards(sb) -> None:
+    rows = [
+        {
+            "id": c["id"],
+            "type": c.get("type", "hogwarts"),
+            "adventure": c.get("adventure", 1),
+            "name_it": c.get("name_it", c["id"]),
+            "name_en": c.get("name_en", c["id"]),
+            "cost": c.get("cost", 0),
+            "effects": c.get("effects", []),
+            "ability_text_it": c.get("ability_text_it"),
+            "ability_text_en": c.get("ability_text_en"),
+            "image_url": c.get("image_url"),
+        }
+        for c in CARD_DATA.values()
+    ]
+    sb.table("cards").upsert(rows, on_conflict="id").execute()
+
+
+@cards_router.get("")
+async def get_cards(
+    adventure: int = 1,
+    sb=Depends(get_supabase),
+):
+    res = sb.table("cards").select("*").lte("adventure", adventure).execute()
+    return res.data or []
 
 
 @router.post("/{code}/start")
