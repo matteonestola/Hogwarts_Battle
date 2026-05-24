@@ -226,17 +226,29 @@ def _buy_card(state, payload, player_id):
     return state
 
 
-def _end_turn(state, player_id):
+def _end_turn(state: dict, player_id: str) -> dict:
     hero_id = _get_active_hero_id(state, player_id)
     if not hero_id:
         return state
 
     hero = state["heroes"][hero_id]
-    hero["discard"].extend(hero["hand"])
-    hero["hand"] = []
-    hero["influence_tokens"] = 0
-    hero["attack_tokens"] = 0
-    _draw_cards(state, hero_id, 5)
+
+    if hero.get("stunned"):
+        hero["discard"].extend(hero["hand"])
+        hero["hand"] = []
+        hero["stunned"] = False
+        hero["health"] = 1
+        hero["influence_tokens"] = 0
+        hero["attack_tokens"] = 0
+        hero.pop("detained", None)
+        _draw_cards(state, hero_id, 5)
+    else:
+        hero["discard"].extend(hero["hand"])
+        hero["hand"] = []
+        hero["influence_tokens"] = 0
+        hero["attack_tokens"] = 0
+        hero.pop("detained", None)
+        _draw_cards(state, hero_id, 5)
 
     turn_order = state["turn_order"]
     current_idx = turn_order.index(hero_id) if hero_id in turn_order else 0

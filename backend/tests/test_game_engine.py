@@ -81,3 +81,14 @@ def test_end_phase_villain_applies_draco_control_token():
     new_state = apply_action(state, "END_PHASE", {}, "player-1")
     # Draco adds 1 control token per turn
     assert new_state["locations"]["control_tokens"][active_loc_id] >= initial_tokens + 1
+
+def test_stunned_hero_recovers_next_turn():
+    state = build_initial_state(1, {"harry": "player-1"})
+    state["heroes"]["harry"]["health"] = 0
+    state["heroes"]["harry"]["stunned"] = True
+    state["phase"] = "actions"
+    # End turn for Harry (stunned) — should recover
+    new_state = apply_action(state, "END_PHASE", {}, "player-1")
+    assert new_state["heroes"]["harry"]["stunned"] is False
+    assert new_state["heroes"]["harry"]["health"] == 1
+    assert len(new_state["heroes"]["harry"]["hand"]) == 5
