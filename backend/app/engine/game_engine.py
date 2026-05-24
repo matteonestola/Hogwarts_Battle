@@ -307,12 +307,9 @@ def _check_win_lose(state):
             state["winner"] = "villains"
             return state
 
-    if not state["villains"]["active"] and not state["villains"]["defeated"]:
-        state["winner"] = "heroes"
-
     config = ADVENTURE_CONFIG.get(state["adventure"], {})
     total_villains = len(config.get("villains", []))
-    if len(state["villains"]["defeated"]) >= total_villains:
+    if total_villains > 0 and len(state["villains"]["defeated"]) >= total_villains:
         state["winner"] = "heroes"
 
     return state
