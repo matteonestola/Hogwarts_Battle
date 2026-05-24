@@ -92,3 +92,27 @@ def test_stunned_hero_recovers_next_turn():
     assert new_state["heroes"]["harry"]["stunned"] is False
     assert new_state["heroes"]["harry"]["health"] == 1
     assert len(new_state["heroes"]["harry"]["hand"]) == 5
+
+def test_all_heroes_stunned_villain_wins():
+    state = build_initial_state(1, {"harry": "player-1", "ron": "player-2"})
+    state["heroes"]["harry"]["stunned"] = True
+    state["heroes"]["harry"]["health"] = 0
+    state["heroes"]["ron"]["stunned"] = True
+    state["heroes"]["ron"]["health"] = 0
+    result = _check_win_lose(state)
+    assert result["winner"] == "villains"
+
+def test_stunned_hero_auto_skipped_in_multiplayer():
+    state = build_initial_state(1, {"harry": "player-1", "ron": "player-2"})
+    # Ron is stunned
+    state["heroes"]["ron"]["stunned"] = True
+    state["heroes"]["ron"]["health"] = 0
+    state["phase"] = "actions"
+    # Harry ends their turn — next should be Ron who is stunned and auto-recovered
+    new_state = apply_action(state, "END_PHASE", {}, "player-1")
+    # Ron should be recovered (stunned=False, health=1, hand=5)
+    assert new_state["heroes"]["ron"]["stunned"] is False
+    assert new_state["heroes"]["ron"]["health"] == 1
+    assert len(new_state["heroes"]["ron"]["hand"]) == 5
+    # Active player should be back to harry (since ron was skipped)
+    assert new_state["active_player_id"] == "player-1"

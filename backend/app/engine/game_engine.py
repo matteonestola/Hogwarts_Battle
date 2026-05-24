@@ -11,6 +11,8 @@ HERO_START_DECKS = {
 
 HERO_HEALTH = {"harry": 10, "ron": 10, "hermione": 10, "neville": 10}
 
+STUN_RECOVERY_HEALTH = 1
+
 
 def _shuffle(lst):
     lst = list(lst)
@@ -237,7 +239,7 @@ def _end_turn(state: dict, player_id: str) -> dict:
         hero["discard"].extend(hero["hand"])
         hero["hand"] = []
         hero["stunned"] = False
-        hero["health"] = 1
+        hero["health"] = STUN_RECOVERY_HEALTH
         hero["influence_tokens"] = 0
         hero["attack_tokens"] = 0
         hero.pop("detained", None)
@@ -254,14 +256,37 @@ def _end_turn(state: dict, player_id: str) -> dict:
     current_idx = turn_order.index(hero_id) if hero_id in turn_order else 0
     next_idx = (current_idx + 1) % len(turn_order)
     next_hero_id = turn_order[next_idx]
+
+    if next_idx == 0:
+        state["turn"] += 1
+
+    # Auto-resolve stunned heroes: recover and skip past them
+    max_skip = len(turn_order)
+    skipped = 0
+    while skipped < max_skip and state["heroes"][next_hero_id].get("stunned"):
+        next_hero = state["heroes"][next_hero_id]
+        # Apply stun recovery to skipped hero
+        next_hero["discard"].extend(next_hero["hand"])
+        next_hero["hand"] = []
+        next_hero["stunned"] = False
+        next_hero["health"] = STUN_RECOVERY_HEALTH
+        next_hero["influence_tokens"] = 0
+        next_hero["attack_tokens"] = 0
+        next_hero.pop("detained", None)
+        _draw_cards(state, next_hero_id, 5)
+        # Advance again
+        current_idx = turn_order.index(next_hero_id)
+        next_idx = (current_idx + 1) % len(turn_order)
+        if next_idx == 0:
+            state["turn"] += 1
+        next_hero_id = turn_order[next_idx]
+        skipped += 1
+
     next_player_id = state["heroes"][next_hero_id]["player_id"]
 
     state["active_player_id"] = next_player_id
     state["phase"] = "dark_arts"
     state["refresh_used"] = False
-
-    if next_idx == 0:
-        state["turn"] += 1
 
     return state
 
