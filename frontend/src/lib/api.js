@@ -37,4 +37,5 @@ export const api = {
     request('POST', `/rooms/${code}/chat`, { content }),
   getCards: (adventure = 1) =>
     request('GET', `/cards?adventure=${adventure}`),
+  getUnlockedAdventures: () => request('GET', '/adventures/unlocked'),
 }

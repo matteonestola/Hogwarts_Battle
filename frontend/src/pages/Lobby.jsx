@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useAuthStore } from '../store/authStore'
 import { useGameStore } from '../store/gameStore'
@@ -11,6 +11,12 @@ export default function Lobby() {
   const { t } = useTranslation()
   const { user, signOut } = useAuthStore()
   const { room, setRoom } = useGameStore()
+
+  const [unlockedAdventures, setUnlockedAdventures] = useState([1])
+
+  useEffect(() => {
+    api.getUnlockedAdventures().then(setUnlockedAdventures).catch(() => {})
+  }, [])
 
   const [mode, setMode] = useState(null) // 'create' | 'join'
   const [code, setCode] = useState('')
@@ -182,7 +188,9 @@ export default function Lobby() {
                 className="w-full mt-1 bg-hogwarts-dark/50 border border-hogwarts-gold/30 rounded-lg p-2 text-hogwarts-parchment"
               >
                 {[1, 2, 3, 4, 5, 6, 7].map((n) => (
-                  <option key={n} value={n}>Adventure {n}</option>
+                  <option key={n} value={n} disabled={!unlockedAdventures.includes(n)}>
+                    Adventure {n} {!unlockedAdventures.includes(n) ? '🔒' : ''}
+                  </option>
                 ))}
               </select>
             </div>
