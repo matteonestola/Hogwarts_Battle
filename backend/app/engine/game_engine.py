@@ -145,6 +145,12 @@ def _apply_effect(state, effect, hero_id):
         _draw_cards(state, hero_id, val)
     elif etype == "heal":
         hero["health"] = min(hero["health"] + val, hero["health_max"])
+    elif etype == "heal_any":
+        hero["health"] = min(hero["health"] + val, hero["health_max"])
+    elif etype == "damage_active_hero":
+        hero["health"] = max(0, hero["health"] - val)
+        if hero["health"] == 0:
+            hero["stunned"] = True
     elif etype == "damage_all":
         for h in state["heroes"].values():
             h["health"] = max(0, h["health"] - val)
