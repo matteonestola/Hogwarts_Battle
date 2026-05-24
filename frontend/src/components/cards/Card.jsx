@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import { useCardStore } from '../../store/cardStore'
 import CardDetail from './CardDetail'
 
 const TYPE_COLORS = {
@@ -10,15 +11,14 @@ const TYPE_COLORS = {
   hero: 'border-green-700/60 bg-green-900/20',
 }
 
-export default function Card({ cardId, cardData, onClick, disabled, showBuy }) {
+export default function Card({ cardId, onClick, disabled, showBuy }) {
   const { i18n } = useTranslation()
+  const { get } = useCardStore()
   const [showDetail, setShowDetail] = useState(false)
   const lang = i18n.language
 
-  const name = cardData
-    ? (cardData[`name_${lang}`] || cardData.name_it || cardId)
-    : cardId
-
+  const cardData = get(cardId)
+  const name = cardData[`name_${lang}`] || cardData.name_it || cardId
   const colorClass = TYPE_COLORS[cardData?.type] || TYPE_COLORS.hogwarts
 
   return (
@@ -27,18 +27,14 @@ export default function Card({ cardId, cardData, onClick, disabled, showBuy }) {
         className={`relative aspect-[2/3] rounded border ${colorClass} cursor-pointer transition-transform hover:scale-105 hover:z-10 ${
           disabled ? 'opacity-50 cursor-not-allowed' : ''
         } flex flex-col items-center justify-center p-1`}
-        onClick={() => {
-          if (!disabled) {
-            setShowDetail(true)
-          }
-        }}
+        onClick={() => { if (!disabled) setShowDetail(true) }}
       >
-        {cardData?.image_url ? (
+        {cardData.image_url ? (
           <img src={cardData.image_url} alt={name} className="w-full h-full object-cover rounded" />
         ) : (
           <div className="text-center">
             <div className="text-xs font-semibold text-hogwarts-parchment leading-tight line-clamp-2">{name}</div>
-            {cardData?.cost != null && (
+            {cardData.cost != null && (
               <div className="mt-1 text-xs text-hogwarts-gold">🔮{cardData.cost}</div>
             )}
           </div>

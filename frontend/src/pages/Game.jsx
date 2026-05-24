@@ -4,6 +4,7 @@ import { useGameStore } from '../store/gameStore'
 import { useAuthStore } from '../store/authStore'
 import { useGameState } from '../hooks/useGameState'
 import { useChat } from '../hooks/useChat'
+import { useCardStore } from '../store/cardStore'
 import { api } from '../lib/api'
 import LocationCard from '../components/board/LocationCard'
 import VillainZone from '../components/board/VillainZone'
@@ -20,7 +21,8 @@ import StunnedModal from '../components/modals/StunnedModal'
 export default function Game() {
   const { t } = useTranslation()
   const { user } = useAuthStore()
-  const { room, gameState, setRoom, setGameState, setChatMessages, setEventLog } = useGameStore()
+  const { room, roomId, gameState, setRoom, setGameState, setChatMessages, setEventLog } = useGameStore()
+  const { loadCards } = useCardStore()
 
   const roomCode = window.location.pathname.split('/game/')[1]
 
@@ -32,6 +34,9 @@ export default function Game() {
     api.getRoom(roomCode).then((r) => {
       setRoom(r)
       setGameState(r.game_state)
+      if (r.game_state?.adventure) {
+        loadCards(r.game_state.adventure)
+      }
     })
     api.getChat(roomCode).then(setChatMessages)
   }, [roomCode])
